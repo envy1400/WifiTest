@@ -67,7 +67,6 @@ static uint32_t receiveIndex = 0;
 static uint32_t modeStringLength = 0;
 static uint32_t connectStringLength = 0;
 static uint8_t receiveBuffer[512];
-static uint8_t connectState = 0;
 static uint32_t setModeCounter = 0;
 
 int main(void)
@@ -114,10 +113,8 @@ int main(void)
                     }                    
                 }
                 else
-                {
-                    uint32_t i = 0;
-                    transmitIndex = 0;
-                    //for(i = 0; i < 40000; i++);
+                {                    
+                    transmitIndex = 0;                    
                     appState = APP_CONNECT;                    
                 }
                 break;
@@ -128,8 +125,7 @@ int main(void)
                 break;
             }
             case APP_SET_MODE:
-            {                
-                uint32_t i;
+            {                                
                 if(transmitIndex < modeStringLength )
                 {
                     if(UART1_IsTxReady())
