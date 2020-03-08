@@ -69,6 +69,10 @@ static uint32_t connectStringLength = 0;
 static uint8_t receiveBuffer[512];
 static uint32_t setModeCounter = 0;
 
+static const uint8_t getIPString[] = "AT+CIPAP?\r\n";
+static uint32_t getIPStringLength;
+static uint32_t iGetIPString = 0;
+
 int main(void)
 {
     // initialize the device
@@ -88,7 +92,9 @@ int main(void)
                 testStringLength = strlen((const char *)testString);
                 modeStringLength = strlen((const char *)modeString);
                 connectStringLength = strlen((const char *)connectString);
+                getIPStringLength = strlen((const char *)getIPString);
                 
+                iGetIPString = 0;
                 transmitIndex = 0;
                 receiveIndex = 0;
                 uint32_t i = 0;
@@ -138,8 +144,9 @@ int main(void)
                 {                                        
                     if(setModeCounter++ > 4000)
                     {
-                        transmitIndex = 0;                                  
-                        appState = APP_CONNECT;
+                        transmitIndex = 0;     
+                        setModeCounter = 0;
+                        appState = APP_CONNECT;                        
                     }                        
                 }
                 break;
@@ -156,11 +163,32 @@ int main(void)
                 }
                 else
                 {
-                    transmitIndex = 0;                    
-                    appState = APP_IDLE;
+                    if(setModeCounter++ > 4000)
+                    {
+                        transmitIndex = 0;     
+                        setModeCounter = 0;
+                        appState = APP_GET_IP;             
+                    }                                                                         
                 }
                 break;               
             }
+            case APP_GET_IP:
+                
+                if(iGetIPString < getIPStringLength)
+                {
+                    if(UART1_IsTxReady())
+                    {
+                        UART1_Write(getIPString[iGetIPString]);
+                        iGetIPString++;
+                    }
+                }
+                else
+                {
+                    iGetIPString = 0;
+                    appState = APP_IDLE;
+                }
+                
+                break;
             case APP_IDLE :
             default:
             {

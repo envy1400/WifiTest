@@ -13,6 +13,7 @@ typedef enum{
     APP_IDLE,
     APP_CONNECT,
     APP_SET_MODE,
+    APP_GET_IP,
 } eAppStates;
 
 #endif  // #define APP_H
